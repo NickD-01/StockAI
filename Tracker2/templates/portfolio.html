@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mijn Portefeuille</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <h1>📊 Portfolio</h1>
+
+<h2>➕ Toevoegen</h2>
+<form method="post">
+  <input type="hidden" name="action" value="add">
+  Ticker: <input name="ticker" required>
+  Aandelen: <input name="shares" type="number" step="0.01" required>
+  Gemiddelde Prijs: <input name="avg_price" type="number" step="0.01" required>
+  <button type="submit">Toevoegen</button>
+</form>
+
+<h2>📋 Huidige Posities</h2>
+{{ table_html|safe }}
+
+<h2>➖ Verwijderen</h2>
+<form method="post">
+  <input type="hidden" name="action" value="delete">
+  Ticker: <input name="ticker" required>
+  <button type="submit" style="color: red;">Verwijder</button>
+</form>
+
+<p>📈 Totale waarde: €{{ total_value }}</p>
+<p>📊 Totale rendement: {{ total_return }}%</p>
+
+</body>
+</html>

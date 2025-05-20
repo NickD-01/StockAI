@@ -37,9 +37,29 @@
       color: red;
       font-weight: bold;
     }
+    .portfolio-button {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 10px 20px;
+      background-color: #333;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    .portfolio-button:hover {
+      background-color: #555;
+    }
   </style>
 </head>
 <body>
+
+  <a href="{{ url_for('portfolio') }}" class="portfolio-button">📊 Go to Portfolio</a>
+
+  <form method="GET" action="{{ url_for('search') }}" style="margin-bottom: 20px;">
+    <input type="text" name="ticker" placeholder="Zoek een ticker..." required>
+    <button type="submit">Zoeken</button>
+  </form>
+
   <h1>📈 AI Stock Tracker Dashboard</h1>
   <table>
     <thead>
@@ -61,8 +81,8 @@
         <td>{{ rec.predicted_monthly }}</td>
         <td>{{ rec.predicted_yearly }}</td>
         <td class="{{ rec.signal | lower }}">{{ rec.signal }}</td>
-        <td>{{ rec.analyst_opinion }}</td>
-        <td>{{ rec.analyst_firm }}</td>
+        <td>{{ rec.analyst_opinion or '—' }}</td>
+        <td>{{ rec.analyst_firm or '—' }}</td>
       </tr>
       {% endfor %}
     </tbody>
