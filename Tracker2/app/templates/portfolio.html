@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mijn Portefeuille</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <h1>👜 Portefeuille</h1>
+  <p>Totaalwaarde: <strong>€{{ total_value }}</strong></p>
+  <p>Totaal rendement: <strong>{{ total_return }} %</strong></p>
+  {{ table_html | safe }}
+  <h2>➕ Transactie toevoegen / positie bijwerken</h2>
+  <form method="post">
+    Ticker <input name="ticker" required />
+    Aandelen <input name="shares" type="number" step="0.01" required />
+    Gem. aankoopprijs <input name="avg_price" type="number" step="0.01" required />
+    <button type="submit">Opslaan</button>
+  </form>
+  <p><a href="/">⬅️ Terug naar dashboard</a></p>
+</body>
+</html>

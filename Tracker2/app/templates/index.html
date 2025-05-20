@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Stock Tracker</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background-color: #f2f2f2;
+    }
+    h1 {
+      color: #333;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border: 1px solid #ccc;
+    }
+    th {
+      background-color: #333;
+      color: #fff;
+    }
+    td.buy {
+      color: green;
+      font-weight: bold;
+    }
+    td.sell {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>📈 AI Stock Tracker Dashboard</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Ticker</th>
+        <th>Dagvoorspelling ($)</th>
+        <th>Maandvoorspelling ($)</th>
+        <th>Jaarvoorspelling ($)</th>
+        <th>AI Signaal</th>
+        <th>Analistenadvies</th>
+        <th>Adviesfirma</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for rec in recommendations %}
+      <tr>
+        <td>{{ rec.ticker }}</td>
+        <td>{{ rec.predicted_daily }}</td>
+        <td>{{ rec.predicted_monthly }}</td>
+        <td>{{ rec.predicted_yearly }}</td>
+        <td class="{{ rec.signal | lower }}">{{ rec.signal }}</td>
+        <td>{{ rec.analyst_opinion }}</td>
+        <td>{{ rec.analyst_firm }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
