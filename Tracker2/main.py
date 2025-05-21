@@ -1,15 +1,33 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, jsonify
 from Tracker2.app.recommender import recommend_for_tickers
 from app.portfolio import load_portfolio, save_portfolio, portfolio_metrics
 from app.data_fetcher import fetch_stock_data
+import json
+import os
 
 app = Flask(__name__)
-WATCHLIST = ["AAPL", "GOOGL", "TSLA", "AMZN"]
+
+WATCHLIST_FILE = "app/watchlist.json"
+
+
+def load_watchlist():
+    if os.path.exists(WATCHLIST_FILE):
+        with open(WATCHLIST_FILE) as f:
+            return json.load(f)
+    return ["AAPL", "GOOGL", "TSLA", "AMZN"]
+
+
+def save_watchlist(tickers):
+    with open(WATCHLIST_FILE, "w") as f:
+        json.dump(tickers, f, indent=2)
+
 
 @app.route("/")
 def index():
-    recs = recommend_for_tickers(WATCHLIST)
-    return render_template("index.html", recommendations=recs, tickers=WATCHLIST)
+    tickers = load_watchlist()
+    recs = recommend_for_tickers(tickers)
+    return render_template("index.html", recommendations=recs, tickers=tickers)
+
 
 @app.route("/portfolio", methods=["GET", "POST"])
 def portfolio():
@@ -38,15 +56,30 @@ def portfolio():
                            total_return=ret)
 
 
-@app.route("/search")
+@app.route("/search", methods=["GET", "POST"])
 def search():
     ticker = request.args.get("ticker", "").upper()
+    if not ticker:
+        return render_template("search_result.html", error="Geen ticker opgegeven.")
+
     try:
         data = fetch_stock_data(ticker, period="6mo", interval="1d")
         curr_price = data["Close"].iloc[-1]
+
+        if request.method == "POST":
+            watchlist = load_watchlist()
+            if ticker not in watchlist:
+                watchlist.append(ticker)
+                save_watchlist(watchlist)
+
         return render_template("search_result.html", ticker=ticker, price=curr_price)
     except Exception:
         return render_template("search_result.html", ticker=ticker, error="Ticker niet gevonden.")
+
+
+@app.route("/tickers")
+def tickers():
+    return jsonify(load_watchlist())
 
 
 if __name__ == "__main__":

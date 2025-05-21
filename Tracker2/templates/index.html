@@ -49,18 +49,40 @@
     .portfolio-button:hover {
       background-color: #555;
     }
+    .search-form {
+      margin-bottom: 20px;
+    }
+    .search-form input[type="text"] {
+      padding: 10px;
+      width: 200px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .search-form button {
+      padding: 10px 15px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .search-form button:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
 
   <a href="{{ url_for('portfolio') }}" class="portfolio-button">📊 Go to Portfolio</a>
 
-  <form method="GET" action="{{ url_for('search') }}" style="margin-bottom: 20px;">
-    <input type="text" name="ticker" placeholder="Zoek een ticker..." required>
-    <button type="submit">Zoeken</button>
+  <h1>📈 AI Stock Tracker Dashboard</h1>
+
+  <!-- 🔍 Search Form -->
+  <form class="search-form" action="{{ url_for('search') }}" method="get">
+    <input type="text" name="ticker" placeholder="Search ticker..." required>
+    <button type="submit">🔍 Search</button>
   </form>
 
-  <h1>📈 AI Stock Tracker Dashboard</h1>
   <table>
     <thead>
       <tr>
