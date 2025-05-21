@@ -51,25 +51,71 @@
     }
     .search-form {
       margin-bottom: 20px;
+      position: relative;
     }
-    .search-form input[type="text"] {
+    .search-form input {
       padding: 10px;
+      font-size: 16px;
       width: 200px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
     }
     .search-form button {
-      padding: 10px 15px;
-      border: none;
-      background-color: #007bff;
-      color: white;
-      border-radius: 4px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    #suggestions {
+      position: absolute;
+      background: white;
+      border: 1px solid #ccc;
+      width: 215px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 10;
+    }
+    .suggestion-item {
+      padding: 8px;
       cursor: pointer;
     }
-    .search-form button:hover {
-      background-color: #0056b3;
+    .suggestion-item:hover {
+      background-color: #f0f0f0;
     }
   </style>
+
+  <script>
+    async function fetchSuggestions(query) {
+      const res = await fetch(`/tickers?q=${query}`);
+      return await res.json();
+    }
+
+    function showSuggestions(results, input) {
+      const container = document.getElementById("suggestions");
+      container.innerHTML = "";
+      if (!results.length) return;
+
+      results.forEach(t => {
+        const div = document.createElement("div");
+        div.textContent = `${t.symbol} – ${t.name}`;
+        div.className = "suggestion-item";
+        div.onclick = () => {
+          input.value = t.symbol;
+          container.innerHTML = "";
+        };
+        container.appendChild(div);
+      });
+    }
+
+    window.onload = () => {
+      const input = document.getElementById("tickerInput");
+      input.addEventListener("input", async () => {
+        const val = input.value;
+        if (val.length >= 1) {
+          const suggestions = await fetchSuggestions(val);
+          showSuggestions(suggestions, input);
+        } else {
+          document.getElementById("suggestions").innerHTML = "";
+        }
+      });
+    };
+  </script>
 </head>
 <body>
 
@@ -77,9 +123,9 @@
 
   <h1>📈 AI Stock Tracker Dashboard</h1>
 
-  <!-- 🔍 Search Form -->
-  <form class="search-form" action="{{ url_for('search') }}" method="get">
-    <input type="text" name="ticker" placeholder="Search ticker..." required>
+  <form class="search-form" action="{{ url_for('search') }}" method="get" autocomplete="off">
+    <input type="text" id="tickerInput" name="ticker" placeholder="Search ticker..." required>
+    <div id="suggestions"></div>
     <button type="submit">🔍 Search</button>
   </form>
 
@@ -109,5 +155,6 @@
       {% endfor %}
     </tbody>
   </table>
+
 </body>
 </html>

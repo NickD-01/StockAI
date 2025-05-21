@@ -79,7 +79,22 @@ def search():
 
 @app.route("/tickers")
 def tickers():
-    return jsonify(load_watchlist())
+    query = request.args.get("q", "").upper()
+    matches = []
+
+    # Load tickers from JSON
+    with open("tickers.json") as f:
+        all_tickers = json.load(f)
+
+    # Filter matches that contain the query
+    for item in all_tickers:
+        if query in item["symbol"].upper() or query in item["name"].upper():
+            matches.append({"symbol": item["symbol"], "name": item["name"]})
+        if len(matches) >= 10:
+            break
+
+    return jsonify(matches)
+
 
 
 if __name__ == "__main__":
