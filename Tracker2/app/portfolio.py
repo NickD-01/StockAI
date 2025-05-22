@@ -1,7 +1,7 @@
 import json
 import os
 import pandas as pd
-from app.data_fetcher import fetch_stock_data   # haalt actuele koersdata op
+from .data_fetcher import fetch_stock_data   # haalt actuele koersdata op
 
 # Bestand waarin de portefeuille persistent wordt opgeslagen
 PORTFOLIO_FILE = "app/portfolio.json"

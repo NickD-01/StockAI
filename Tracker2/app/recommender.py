@@ -1,5 +1,5 @@
-from app.data_fetcher import fetch_stock_data
-from app.predictor import predict_next_day, predict_period
+from .data_fetcher import fetch_stock_data
+from .predictor import predict_next_day, predict_period
 
 
 

@@ -4,6 +4,9 @@ from app.portfolio import load_portfolio, save_portfolio, portfolio_metrics
 from app.data_fetcher import fetch_stock_data
 import json
 import os
+import plotly.graph_objs as go
+
+
 
 app = Flask(__name__)
 
@@ -82,11 +85,9 @@ def tickers():
     query = request.args.get("q", "").upper()
     matches = []
 
-    # Load tickers from JSON
     with open("tickers.json") as f:
         all_tickers = json.load(f)
 
-    # Filter matches that contain the query
     for item in all_tickers:
         if query in item["symbol"].upper() or query in item["name"].upper():
             matches.append({"symbol": item["symbol"], "name": item["name"]})
@@ -94,6 +95,40 @@ def tickers():
             break
 
     return jsonify(matches)
+
+@app.route("/daily")
+def daily():
+    tickers = load_watchlist()
+    daily_recs = recommend_for_tickers(tickers)
+    charts = []
+
+    for rec in daily_recs:
+        try:
+            data = fetch_stock_data(rec["ticker"], period="1mo", interval="1d")
+            if data is None or data.empty:
+                continue
+
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=data["Date"], y=data["Close"], mode="lines", name=rec["ticker"]))
+
+            # SMA 7
+            data['SMA_7'] = data['Close'].rolling(window=7).mean()
+            fig.add_trace(go.Scatter(x=data["Date"], y=data['SMA_7'], mode="lines", name="SMA 7"))
+
+            fig.update_layout(
+                title=f"{rec['ticker']} - Laatste 30 dagen",
+                xaxis_title="Datum",
+                yaxis_title="Prijs ($)",
+                hovermode="x unified"
+            )
+
+            chart_html = fig.to_html(full_html=False)
+            charts.append(chart_html)
+        except Exception as e:
+            print(f"Fout bij ophalen of plotten van {rec['ticker']}: {e}")
+
+    return render_template("daily.html", recommendations=daily_recs, charts=charts, zip=zip)
+
 
 
 

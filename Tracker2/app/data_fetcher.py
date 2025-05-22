@@ -1,7 +1,6 @@
 import yfinance as yf
 import pandas as pd
 
-
 def fetch_stock_data(ticker, period="1y", interval="1d"):
     """
     Haalt historische aandelen data op met yfinance.
@@ -18,8 +17,8 @@ def fetch_stock_data(ticker, period="1y", interval="1d"):
         stock = yf.Ticker(ticker)
         hist = stock.history(period=period, interval=interval)
         if hist.empty:
+            print(f"⚠️ Geen data gevonden voor {ticker}")
             return None
-        hist.reset_index(inplace=True)
         return hist
     except Exception as e:
         print(f"Fout bij ophalen data voor {ticker}: {e}")

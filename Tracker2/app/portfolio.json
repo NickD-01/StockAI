@@ -2,5 +2,9 @@
   "AMZN": {
     "shares": 1.0,
     "avg_price": 251.0
+  },
+  "SOUN": {
+    "shares": 11.0,
+    "avg_price": 9.5
   }
 }
