@@ -19,3 +19,30 @@ th {
 td {
     text-align: center;
 }
+.login-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.alerts {
+    padding: 10px;
+    margin-bottom: 15px;
+    background: #ff6b6b;
+    color: white;
+    border-radius: 4px;
+}

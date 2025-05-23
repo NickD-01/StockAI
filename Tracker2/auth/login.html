@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="login-container">
+        <h1>Login</h1>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alerts">
+                    {{ messages[0] }}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <form method="POST" action="/login">
+            <div class="form-group">
+                <input type="text" name="username" placeholder="Gebruikersnaam" required>
+            </div>
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Wachtwoord" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <p>Nog geen account? <a href="{{ url_for('auth.register') }}">Registreer hier</a></p>
+    </div>
+</body>
+</html>

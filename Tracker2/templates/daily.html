@@ -11,48 +11,80 @@
             border: 1px solid #dee2e6;
             border-radius: 8px;
             padding: 15px;
-            background-color: #f8f9fa;
+            background-color: #ffffff;
         }
-
         .controls {
             margin-bottom: 20px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
         }
-
         .chart-title {
             margin-top: 10px;
-            margin-bottom: 5px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #333;
         }
+        .recommendation-info {
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .signal {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        .signal.buy { background-color: #d4edda; color: #155724; }
+        .signal.sell { background-color: #f8d7da; color: #721c24; }
+        .signal.hold { background-color: #fff3cd; color: #856404; }
     </style>
 </head>
 <body class="bg-light">
 
 <div class="container py-5">
-    <h1 class="text-center mb-4">📊 Dagelijkse Aanbevelingen</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>📊 Dagelijkse Aanbevelingen</h1>
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Terug naar Dashboard</a>
+    </div>
 
-    <div class="controls row mb-4">
-        <div class="col-md-4">
-            <label for="period" class="form-label">Periode:</label>
-            <select id="period" class="form-select">
-                <option selected>1mo</option>
-                <option>1y</option>
-                <option>6mo</option>
-                <option>3mo</option>
-                <option>max</option>
-            </select>
-        </div>
-        <div class="col-md-8">
-            <label class="form-label">Technische indicatoren:</label><br>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="sma" checked>
-                <label class="form-check-label" for="sma">SMA</label>
+    <div class="controls">
+        <div class="row">
+            <div class="col-md-4">
+                <label for="period" class="form-label">Periode:</label>
+                <select id="period" class="form-select">
+                    <option value="1mo">1 Maand</option>
+                    <option value="3mo" selected>3 Maanden</option>
+                    <option value="6mo">6 Maanden</option>
+                    <option value="1y">1 Jaar</option>
+                    <option value="max">Maximum</option>
+                </select>
             </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="ema">
-                <label class="form-check-label" for="ema">EMA</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="rsi">
-                <label class="form-check-label" for="rsi">RSI</label>
+            <div class="col-md-8">
+                <label class="form-label">Technische indicatoren:</label>
+                <div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="sma" checked>
+                        <label class="form-check-label" for="sma">SMA</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="bb" checked>
+                        <label class="form-check-label" for="bb">Bollinger Bands</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="volume" checked>
+                        <label class="form-check-label" for="volume">Volume</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="rsi" checked>
+                        <label class="form-check-label" for="rsi">RSI</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="candlestick">
+                        <label class="form-check-label" for="candlestick">Candlesticks</label>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -60,23 +92,81 @@
     {% for rec, chart in recommendations|zip(charts) %}
     <div class="chart-container">
         <h3 class="chart-title">{{ rec.name }} ({{ rec.symbol }})</h3>
-        <div>{{ chart | safe }}</div>
+        
+        <div class="recommendation-info">
+            <div class="row">
+                <div class="col-md-4">
+                    <strong>Signaal:</strong> 
+                    <span class="signal {{ rec.signal|lower }}">{{ rec.signal }}</span>
+                </div>
+                <div class="col-md-4">
+                    <strong>Huidige Prijs:</strong> {{ rec.predicted_daily }}
+                </div>
+                <div class="col-md-4">
+                    <strong>Analyse:</strong> {{ rec.analyst_opinion }}
+                </div>
+            </div>
+        </div>
+
+        <div class="chart">
+            {{ chart | safe }}
+        </div>
     </div>
     {% endfor %}
-
 </div>
 
 <script>
-    // Placeholder voor toekomstige interacties
-    document.getElementById("period").addEventListener("change", function () {
-        alert("Periode wijzigen wordt binnenkort interactief gemaakt.");
+document.addEventListener('DOMContentLoaded', function() {
+    const indicators = {
+        sma: document.getElementById('sma'),
+        bb: document.getElementById('bb'),
+        volume: document.getElementById('volume'),
+        rsi: document.getElementById('rsi'),
+        candlestick: document.getElementById('candlestick')  // Voeg deze toe aan de HTML
+    };
+
+    // Update zichtbaarheid van indicatoren
+    function updateVisibility() {
+        document.querySelectorAll('.js-plotly-plot').forEach(chart => {
+            const traces = chart.data;
+            traces.forEach(trace => {
+                if (trace.name === 'Koers') {
+                    // Hoofdlijn altijd zichtbaar laten
+                    Plotly.restyle(chart, {'visible': true}, [trace.index]);
+                }
+                else if (trace.name === 'OHLC') {
+                    Plotly.restyle(chart, {'visible': indicators.candlestick?.checked || false}, [trace.index]);
+                }
+                else if (trace.name.includes('SMA')) {
+                    Plotly.restyle(chart, {'visible': indicators.sma.checked}, [trace.index]);
+                }
+                else if (trace.name.includes('BB')) {
+                    Plotly.restyle(chart, {'visible': indicators.bb.checked}, [trace.index]);
+                }
+                else if (trace.name === 'Volume' || trace.name === 'Volume EMA') {
+                    Plotly.restyle(chart, {'visible': indicators.volume.checked}, [trace.index]);
+                }
+                else if (trace.name === 'RSI') {
+                    Plotly.restyle(chart, {'visible': indicators.rsi.checked}, [trace.index]);
+                }
+            });
+        });
+    }
+
+    // Event listeners voor de checkboxes
+    Object.values(indicators).forEach(checkbox => {
+        if (checkbox) {  // Check of de checkbox bestaat
+            checkbox.addEventListener('change', updateVisibility);
+        }
     });
 
-    document.querySelectorAll(".form-check-input").forEach(cb => {
-        cb.addEventListener("change", function () {
-            alert("Indicatoren aan/uit werkt binnenkort.");
-        });
+    // Event listener voor periode selectie
+    document.getElementById('period').addEventListener('change', function() {
+        const period = this.value;
+        // Hier komt later de code voor het updaten van de periode
+        alert(`Periode update naar ${period} komt binnenkort beschikbaar`);
     });
+});
 </script>
 
 </body>
